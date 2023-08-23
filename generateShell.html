@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>脚本生成器</title>
+	<script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+</head>
+<body>
+	<h2>打包脚本生成器</h2>
+	<form id="form-bundle">
+		项目代号：<input type="text" name="projectCode" placeholder="mt01"><br />
+		项目路径：<input type="text" name="projectPath" placeholder="/usr/games/ghjfgh"><br />
+		gradle类型：<select name="gradleType"><option value="0">*.gradle.kts</option><option value="1">*.gradle</option></select><br />
+		flavor名称：<input type="text" name="flavorName" placeholder="prop"><br />
+		zip密码：<input type="text" name="zipPwd" placeholder="123456"><br />
+		保存路径：<input type="text" name="savePath" placeholder="/home/ubuntu/bundleZip"><br />
+		<input type="reset" value="清空" />
+		<input type="submit" value="预览" />
+		<input type="button" id="download" value="下载" />
+	</form>
+	<div id="shell" style="display: none;">
+		<div>#!/bin/sh</div>
+		<div>set -e</div>
+		<div>cd <span class="projectPath"></span></div>
+		<div>git branch</div>
+		<div>git pull</div>
+
+		<div>gradle_file="app/build.gradle<span id="gradleSuffix"></span>"</div>
+		<div>name_line=$(grep -E "versionName" "$gradle_file")</div>
+		<div>versionName=$(echo "$name_line" | awk -F '"' '{print $2}')</div>
+		<div>code_line=$(grep -E "versionCode" "$gradle_file")</div>
+		<div>versionCode=$(echo "$code_line" | awk -F "<span class="gradleType"></span>" '{print $2}')</div>
+		<div>fileName="<span class="projectCode"></span>-$versionName-v$versionCode-release"</div>
+		<div>echo "$fileName"</div>
+		<div>sh gradlew clean app:bundle<span class="upperFlavor"></span>Release</div>
+		<div>cd app/build/outputs/bundle/<span class="lowerFlavor"></span>Release/</div>
+		<div>mv app-prop-release.aab $fileName.aab</div>
+		<div>zip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map -O <span class="savePath"></span>/$fileName-proguard.map</div>
+		<div>zip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map</div>
+		<div>zip -rP <span class="zipPwd"></span> <span class="savePath"></span>/$fileName.zip $fileName.aab</div>
+		<!-- <div>cat /usr/games/bptrackhealth/prop/prop/assets/remote.json</div> -->
+	</div>
+	<script type="text/javascript">
+		function formatShell() {
+			for (e of $('#form-bundle').serializeArray()) {
+				if (e.value == '') {
+					alert(e.name+'为空')
+					return false
+				}
+				$('.'+e.name).html(e.value)
+				if (e.name == 'gradleType') {
+					if (e.value == 1) {
+						$('#gradleSuffix').html('')
+						$('.'+e.name).html(" ")
+					} else {
+						$('#gradleSuffix').html('.kts')
+						$('.'+e.name).html("= ")
+					}
+				} else if (e.name == 'flavorName') {
+					$('.upperFlavor').html(e.value.charAt(0).toUpperCase() + e.value.slice(1))
+					$('.lowerFlavor').html(e.value.charAt(0).toLowerCase() + e.value.slice(1))
+				}
+			}
+			$('#shell')[0].style['display'] = 'block'
+			return true
+		}
+		$("#form-bundle").submit(function(e) {
+			e.preventDefault()
+			console.log(e)
+			formatShell()
+		})
+		
+		$("#download").on("click", function() {
+		    if (!formatShell()) return
+		    var content = $('#shell').text().replace('\n','').replaceAll('\t','')
+		    console.log(content)
+		    const blob = new Blob([content], {
+		    	type: "text/plain"
+		    })
+		    const url = URL.createObjectURL(blob);
+
+		    const downloadLink = document.createElement("a");
+			downloadLink.href = url;
+			downloadLink.download = $('input[name="projectCode"]')[0].value+"-bundle.sh";
+
+			document.body.appendChild(downloadLink);
+			downloadLink.click();
+			document.body.removeChild(downloadLink);
+		});
+	</script>
+
+
+	<h2>查看签名的哈希散列base64编码</h2>
+	<form id="form-preview-sign">
+		alias：<input type="text" name="alias" placeholder="alias"><br />
+		签名路径：<input type="text" name="keystorePath" placeholder="../bptrackhealth.keystore"><br />
+		storePass：<input type="text" name="keystorePwd" placeholder="123456"><br />
+		<input type="submit" value="生成" />
+		<input type="button" id="btn-preview-sign" value="复制" />
+	</form>
+	<div id="copy-preview-sign"></div>
+	<script type="text/javascript">
+		function copyText(content) {
+			// 创建一个临时的 textarea 元素，并设置其值为要复制的文本内容
+	        var tempTextarea = $('<textarea>');
+	        tempTextarea.val(content);
+	        
+	        // 将 textarea 添加到页面中
+	        $('body').append(tempTextarea);
+	        
+	        // 选中文本内容
+	        tempTextarea.select();
+	        
+	        // 复制文本内容到剪贴板
+	        document.execCommand('copy');
+	        
+	        // 移除临时的 textarea 元素
+	        tempTextarea.remove();
+	        
+	        // 提示用户复制成功
+	        alert('复制成功');
+		}
+		function formatShellPreviewSign() {
+			//keytool -exportcert -alias bptrackhealth -keystore bptrackhealth.keystore -storepass bptrackhealth | openssl sha1 -binary | openssl base64
+			var templeate = "keytool -exportcert -alias *** -keystore *** -storepass *** | openssl sha1 -binary | openssl base64"
+			for (e of $('#form-preview-sign').serializeArray()) {
+				if (e.value == '') {
+					alert(e.name+'为空')
+					return false
+				}
+				templeate = templeate.replace("***", e.value)
+			}
+			$("#copy-preview-sign").html(templeate)
+			return true
+		}
+		$("#form-preview-sign").submit(function(e) {
+			e.preventDefault()
+			console.log(e)
+			formatShellPreviewSign()
+		})
+		$("#btn-preview-sign").on("click", function() {
+			if (!formatShellPreviewSign()) return
+			copyText($('#copy-preview-sign').text())
+		})
+	</script>
+
+
+	<h2>生成签名文件keystore</h2>
+	<form id="form-generate-sign">
+		alias：<input type="text" name="alias" placeholder="alias"><br />
+		keyPass：<input type="text" name="keyPwd" placeholder="123456"><br />
+		签名路径：<input type="text" name="keystorePath" placeholder="../bptrackhealth.keystore"><br />
+		storePass：<input type="text" name="keystorePwd" placeholder="123456"><br />
+		<input type="submit" value="生成" />
+		<input type="button" id="btn-generate-sign" value="复制" />
+	</form>
+	<div id="copy-generate-sign"></div>
+	<script type="text/javascript">
+		function formatShellGenerateSign() {
+			//keytool -genkeypair -v -alias bptrackhealth -keyalg RSA -keysize 2048 -validity 36500 -keypass bptrackhealth -keystore bptrackhealth.keystore -storepass bptrackhealth
+			var templeate = "keytool -genkeypair -v -alias *** -keyalg RSA -keysize 2048 -validity 36500 -keypass *** -keystore *** -storepass ***"
+			for (e of $('#form-generate-sign').serializeArray()) {
+				if (e.value == '') {
+					alert(e.name+'为空')
+					return false
+				}
+				templeate = templeate.replace("***", e.value)
+			}
+			$("#copy-generate-sign").html(templeate)
+			return true
+		}
+		$("#form-generate-sign").submit(function(e) {
+			e.preventDefault()
+			console.log(e)
+			formatShellGenerateSign()
+		})
+		$("#btn-generate-sign").on("click", function() {
+			if (!formatShellGenerateSign()) return
+			copyText($('#copy-generate-sign').text())
+		})
+	</script>
+
+
+	<h2>生成play store上架output.zip</h2>
+	<form id="form-generate-output">
+		pepk.jar路径：<input type="text" name="alias" value="pepk.jar" placeholder="默认在执行的文件夹中"><br />
+		签名路径：<input type="text" name="keystorePath" placeholder="../bptrackhealth.keystore"><br />
+		alias：<input type="text" name="alias" placeholder="alias"><br />
+		生成output.zip路径：<input type="text" name="alias" value="output.zip" placeholder="默认生成在执行的文件夹中"><br />
+		加密公钥路径：<input type="text" name="keystorePwd" value="encryption_public_key.pem" placeholder="默认在执行的文件夹中"><br />
+		<input type="submit" value="生成" />
+		<input type="button" id="btn-generate-output" value="复制" />
+	</form>
+	<div id="copy-generate-output"></div>
+	<script type="text/javascript">
+		function formatShellGenerateOutput() {
+			//java -jar pepk.jar --keystore=../app.keystore --alias=android --output=output.zip --include-cert --rsa-aes-encryption --encryption-key-path=encryption_public_key.pem
+			var templeate = "java -jar *** --keystore=*** --alias=*** --output=*** --include-cert --rsa-aes-encryption --encryption-key-path=***"
+			for (e of $('#form-generate-output').serializeArray()) {
+				if (e.value == '') {
+					alert(e.name+'为空')
+					return false
+				}
+				templeate = templeate.replace("***", e.value)
+			}
+			$("#copy-generate-output").html(templeate)
+			return true
+		}
+		$("#form-generate-output").submit(function(e) {
+			e.preventDefault()
+			console.log(e)
+			formatShellGenerateOutput()
+		})
+		$("#btn-generate-output").on("click", function() {
+			if (!formatShellGenerateOutput()) return
+			copyText($('#copy-generate-output').text())
+		})
+	</script>
+	
+</body>
+</html>
