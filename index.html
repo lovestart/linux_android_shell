@@ -11,6 +11,7 @@
 	<form id="form-bundle">
 		项目代号：<input type="text" name="projectCode" placeholder="mt01"><br />
 		项目路径：<input type="text" name="projectPath" placeholder="/usr/games"><br />
+		配置路径：<input type="text" name="configPath" placeholder="/usr/games"><br />
 		gradle类型：<select name="gradleType"><option value="0">*.gradle.kts</option><option value="1">*.gradle</option></select><br />
 		flavor名称：<input type="text" name="flavorName" placeholder="flaovorName"><br />
 		zip密码：<input type="text" name="zipPwd" placeholder="123456"><br />
@@ -22,7 +23,7 @@
 	<div id="shell" style="display: none;">
 		<div>#!/bin/sh</div>
 		<div>set -e</div>
-		<div>cd <span class="projectPath"></span></div>
+		<div>cd <span class="projectPath"></span>/</div>
 		<div>git branch</div>
 		<div>git pull</div>
 
@@ -33,6 +34,7 @@
 		<div>versionCode=$(echo "$code_line" | awk -F "<span class="gradleType"></span>" '{print $2}')</div>
 		<div>fileName="<span class="projectCode"></span>-$versionName-v$versionCode-release"</div>
 		<div>echo "$fileName"</div>
+		<div>cp -rf <span class="configPath"></span> <span class="projectPath"></span>/</div>
 		<div>sh gradlew clean app:bundle<span class="upperFlavor"></span>Release</div>
 		<div>cd app/build/outputs/bundle/<span class="lowerFlavor"></span>Release/</div>
 		<div>mv app-prop-release.aab $fileName.aab</div>
