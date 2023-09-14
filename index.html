@@ -5,8 +5,283 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>脚本生成器</title>
 	<script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+	<script src="http://stuk.github.io/jszip/dist/jszip.js"></script>
+
+    <script type="text/javascript" src="http://stuk.github.io/jszip-utils/dist/jszip-utils.js"></script>
+    <style type="text/css">
+    	ul.domtree,
+		ul.domtree ul {
+		    margin: 0;
+		    padding: 0 0 0 2em;
+		}
+		 
+		ul.domtree li {
+		    list-style: none;
+		    position: relative;
+		}
+		 
+		ul.domtree>li:first-child:before {
+		    border-style: none none solid none;
+		}
+		 
+		ul.domtree li:before {
+		    position: absolute;
+		    content: '';
+		    top: -0.01em;
+		    left: -0.7em;
+		    width: 0.5em;
+		    height: 0.615em;
+		    border-style: none none solid solid;
+		    border-width: 0.05em;
+		    border-color: #aaa;
+		}
+		 
+		ul.domtree li:not(:last-child):after {
+		    position: absolute;
+		    content: '';
+		    top: 0.7em;
+		    left: -0.7em;
+		    bottom: 0;
+		    border-style: none none none solid;
+		    border-width: 0.05em;
+		    border-color: #aaa;
+		}
+		div {
+			white-space: pre-wrap;
+		}
+    </style>
 </head>
 <body>
+	<h2>配置文件夹</h2>
+	<ul class="domtree">
+		<input type="text" id="config-rootFolder" placeholder="根目录名称">
+	    <ul>
+	    	<li>
+		        <input type="text" id="config-flavorName" placeholder="flavor名称">
+		        <ul>
+		            <li>
+		                assets
+		                <ul>
+		                    <li><input type="checkbox" value="webkitdirectory" id="config-folder-file">附带文件夹</input><input type="file" id="configFileAssets" multiple /></li>
+		                </ul>
+		            </li>
+		            <li>
+		                res
+		                <ul>
+		                    <li>
+				                xml
+				                <ul>
+				                    <li><textarea type="text" id="config-hostName" placeholder="http域名换行输入多个"></textarea></li>
+				                </ul>
+		                    </li>
+		                </ul>
+		            </li>
+		            <li>google-services.json<input type="file" id="configFileGoogle" /></li>
+		        </ul>
+		    </li>
+		    <li>
+		    	签名文件
+		    	<input type="file" id="configFileSign" />
+		    	<input id="config-store-pwd" type="text" placeholder="store密码" />
+		    	<input id="config-alias" type="text" placeholder="别名" />
+		    	<input id="config-key-pwd" type="text" placeholder="key密码" />
+		    </li>
+		    <li>
+		    	<span class="config-rootFolder-name"></span>.gradle.kts
+		    	<select id="config-algorithm"><option value="">不加密</option><option>AES</option><option>DES</option></select>
+		    	<input id="config-transformation" type="text" placeholder="AES/ECB/PKCS5Padding" />
+		    	<input id="config-key" type="text" placeholder="key" />
+		    	<input id="config-iv" type="text" placeholder="iv" />
+		    </li>
+		    <li><span class="config-rootFolder-name"></span>.properties</li>
+	    </ul>
+	</ul>
+	<div>忽略规则</div>
+	<div>~/.gitignore</div>
+	<div id="root-ignore" style="border: dotted 1px black;"></div>
+	<div>~/app/.gitignore</div>
+	<div id="app-ignore" style="border: dotted 1px black;"></div>
+	<div>引用方法</div>
+	<div>~/settings.gradle.kts</div>
+	<div id="settings-gradle" style="border: dotted 1px black;"></div>
+	<div>~/app/build.gradle.kts</div>
+	<div id="app-gradle" style="border: dotted 1px black;"></div>
+	<input type="button" id="download-config" value="下载" />
+	<script type="text/javascript">
+		var configFiles = {}
+		$("input[id^='configFile']").on("change", function(event) {
+			configFiles[event.currentTarget.id] = event.target.files;
+		})
+		$("#config-rootFolder").on("change", function(event) {
+			$(".config-rootFolder-name").html($("#config-rootFolder")[0].value)
+		})
+		$("#config-folder-file").on("change", function(event) {
+			$("#configFileAssets")
+			if (event.currentTarget.checked) {
+				$("#configFileAssets").attr(event.currentTarget.value, "")
+			} else {
+				$("#configFileAssets").removeAttr(event.currentTarget.value)
+			}
+		})
+		function insertFile(folder, fileType) {
+			if (configFiles[fileType] == null) return false
+			var result = false
+			var fileName = ""
+			for (file of configFiles[fileType]) {
+				console.log(file)
+				if (fileType == "configFileGoogle") {
+					fileName = "google-services.json"
+				} else {
+					fileName = file.name
+				}
+				folder.file(fileName, file.slice(0, file.size, file.type))
+				result = true
+			}
+			return result
+		}
+		function insertFolder(folder, fileType) {
+			if (configFiles[fileType] == null) return false
+			var result = false
+			var folderMap = {}
+			folderMap[folder.root] = folder
+			for (file of configFiles[fileType]) {
+				if (file.name.indexOf("DS_Store") != -1) continue
+				var level = file.webkitRelativePath.split("/").slice(0, -1)
+				if (level.length == 0) {
+					console.log(file)
+					folder.file(file.name, file.slice(0, file.size, file.type))
+					continue
+				}
+				var parentFolder = folder.root
+				for (sub of level) {
+					var temp = parentFolder+sub+"/"
+					if (folderMap[temp] == null) {
+						folderMap[temp] = folderMap[parentFolder].folder(sub)
+					}
+					parentFolder = temp
+				}
+				console.log(file)
+				folderMap[parentFolder].file(file.name, file.slice(0, file.size, file.type))
+			}
+			return result
+		}
+		function string2blob(content) {
+			return new Blob([content], {
+		    	type: "text/plain"
+		    })
+		}
+		$("#download-config").on("click", function() {
+			var rootFolderName = $("#config-rootFolder")[0].value
+			if (rootFolderName == '') {
+				alert("没有输入根目录名称")
+				return
+			}
+			var flavorFolderName = $("#config-flavorName")[0].value
+			if (flavorFolderName == '') {
+				alert("没有输入flavor名称")
+				return
+			}
+
+			var rootIgnore = '/###'
+				.replace("###", rootFolderName)
+			$('#root-ignore').text(rootIgnore)
+
+			var appIgnore = 'src/###\n###'
+				.replaceAll("###", flavorFolderName)
+			$('#app-ignore').text(appIgnore)
+
+			var settingsGradle = 'apply(from = "###/###.gradle.kts")\nval 变量名 = extra["###"] as java.util.Properties\n变量名.getProperty("XXXX")'
+				.replaceAll("###", rootFolderName)
+				.replaceAll("###", flavorFolderName)
+				.replaceAll("###", flavorFolderName)
+			$('#settings-gradle').text(settingsGradle)
+
+			var appGradle = 'apply(from = "../###/###.gradle.kts")\nval 变量名 = extra["###"] as java.util.Properties\n变量名.getProperty("XXXX")'
+				.replaceAll("###", rootFolderName)
+				.replaceAll("###", flavorFolderName)
+				.replaceAll("###", flavorFolderName)
+			$('#app-gradle').text(appGradle)
+
+		    var jszip = new JSZip()
+		    var rootFolder = jszip.folder(rootFolderName)
+		    var flavorFolder = rootFolder.folder(flavorFolderName)
+		    var assetsFolder = flavorFolder.folder("assets")
+		    var xmlFolder = flavorFolder.folder("res").folder("xml")
+
+		    if (!insertFile(rootFolder, "configFileSign")) {
+				alert("没有上传签名文件")
+		    	return
+		    }
+		    if (!insertFile(flavorFolder, "configFileGoogle")) {
+				alert("没有上传google-services.json")
+		    	return
+		    }
+		    insertFolder(assetsFolder, "configFileAssets")
+
+			var hostName = $("#config-hostName")[0].value.trim()
+			if (hostName != '') {
+				var networkConfig = '<?xml version="1.0" encoding="utf-8"?>\n<network-security-config>\n    <domain-config cleartextTrafficPermitted="true">\n#####    </domain-config>\n</network-security-config>'
+				var hostRule = hostName.split("\n").filter(function(e) {
+					return e != ''
+				}).map(function(e) {
+					return '        <domain includeSubdomains="true">'+e+'</domain>\n'
+				}).join("")
+				networkConfig = networkConfig.replace("#####", hostRule)
+				console.log(networkConfig)
+				xmlFolder.file("network_security_config.xml", string2blob(networkConfig))
+			}
+
+			var gradle_kts = 'import java.io.FileOutputStream\nimport java.util.Properties\nimport javax.crypto.Cipher\nimport javax.crypto.spec.SecretKeySpec\n\n\nval topFolderName = "###"\nval properties = Properties()\nproperties.load(rootDir.resolve("${topFolderName}/${topFolderName}.properties").inputStream())\nextra.set(topFolderName, properties)\n\nif (extensions.findByName("android") == null) {\n    val encryFolder = "${topFolderName}/${properties.getProperty("flavor")}/assets"\n    println("------------- begin copy flavor")\n    val flavor = File("app/src/${properties.getProperty("flavor")}")\n    if (flavor.exists()) {\n        println("clear flavor folder")\n        deleteFolder(flavor)\n    }\n    val folder = File("${topFolderName}/${properties.getProperty("flavor")}")\n    if (folder.exists()) {\n        println("copy flavor folder")\n        for (item in folder.walkTopDown()) {\n            val targetPath = item.path.replaceFirst(topFolderName, "app/src")\n            if (item.isDirectory) {\n                File(targetPath).takeIf { !it.exists() }?.mkdir()\n            } else {\n                if (item.path.contains(encryFolder)) {\n                    println("encrypt $targetPath")\n                    encryptFile(item, File(targetPath))\n                } else {\n                    println("insert $targetPath")\n                    item.copyTo(File(targetPath))\n                }\n            }\n        }\n    }\n    println("------------- end copy flavor")\n}\n\nfun deleteFolder(file: File) {\n    if (file.isFile) {\n        println("delete ${file.path}")\n        file.delete()\n    } else {\n        file.listFiles().forEach {\n            deleteFolder(it)\n        }\n        file.delete()\n    }\n}'
+			gradle_kts = gradle_kts.replace("###", rootFolderName)
+			var gradle_noiv = '\n\nfun encryptFile(orgin: File, target: File) {\n    try {\n        val key = "#key#"\n        val keySpec = SecretKeySpec(key.toByteArray(), "#algorithm#")\n        val cipher = Cipher.getInstance("#transformation#")\n        cipher.init(Cipher.ENCRYPT_MODE, keySpec)\n        FileOutputStream(target).use {\n            it.write(cipher.doFinal(orgin.readBytes()))\n            it.flush()\n        }\n    } catch (e: Exception) {\n        e.printStackTrace()\n    }\n}'
+			var gradle_iv = '\n\nfun encryptFile(orgin: File, target: File) {\n    try {\n        val key = "#key#"\n        val iv = "#iv#"\n        val keySpec = SecretKeySpec(key.toByteArray(), "#algorithm#")\n        val ivSpec = IvParameterSpec(iv.toByteArray())\n        val cipher = Cipher.getInstance("#transformation#")\n        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)\n        FileOutputStream(target).use {\n            it.write(cipher.doFinal(orgin.readBytes()))\n            it.flush()\n        }\n    } catch (e: Exception) {\n        e.printStackTrace()\n    }\n}'
+			var gradle_noEncrypt = '\n\nfun encryptFile(orgin: File, target: File) {\n    orgin.copyTo(target)\n}'
+			var algorithm = $("#config-algorithm")[0].value
+			var transformation = $("#config-transformation")[0].value
+			var key = $("#config-key")[0].value
+			var iv = $("#config-iv")[0].value
+			if (algorithm == 'AES') {
+				gradle_noiv = gradle_noiv.replace("#algorithm#", algorithm)
+				gradle_noiv = gradle_noiv.replace("#transformation#", transformation)
+				gradle_noiv = gradle_noiv.replace("#key#", key)
+				gradle_kts += gradle_noiv
+			} else if (algorithm == 'DES') {
+				gradle_iv = gradle_iv.replace("#algorithm#", algorithm)
+				gradle_iv = gradle_iv.replace("#transformation#", transformation)
+				gradle_iv = gradle_iv.replace("#key#", key)
+				gradle_iv = gradle_iv.replace("#iv#", iv)
+				gradle_kts += gradle_iv
+			} else {
+				gradle_kts += gradle_noEncrypt
+			}
+			rootFolder.file(rootFolderName+".gradle.kts", string2blob(gradle_kts))
+
+			var properties = 'keystore=../###/###\nstorePwd=###\nkeyName=###\nkeyPwd=###\n\nflavor=###'
+				.replace('###', rootFolderName)
+				.replace('###', configFiles.configFileSign[0].name)
+				.replace('###', $("#config-store-pwd")[0].value)
+				.replace('###', $("#config-alias")[0].value)
+				.replace('###', $("#config-key-pwd")[0].value)
+				.replace('###', flavorFolderName)
+			rootFolder.file(rootFolderName+".properties", string2blob(properties))
+
+
+		    jszip.generateAsync({ type: "blob" })
+		    	.then(function (content) {
+			    // 创建一个下载链接
+			    var link = document.createElement("a");
+			    link.href = URL.createObjectURL(content);
+			    link.download = rootFolderName+".zip"; // 设置下载文件的名称
+
+			    // 触发点击下载链接
+			    link.click();
+				document.body.removeChild(link);
+			  })
+			  .catch(function (error) {
+			    console.error("Error creating ZIP file:", error);
+			  });
+		})
+	</script>
 	<h2>生成打包脚本</h2>
 	<form id="form-bundle">
 		项目代号：<input type="text" name="projectCode" placeholder="mt01"><br />
@@ -20,51 +295,31 @@
 		<input type="submit" value="预览" />
 		<input type="button" id="download" value="下载" />
 	</form>
-	<div id="shell" style="display: none;">
-		<div>#!/bin/sh</div>
-		<div>set -e</div>
-		<div>cd <span class="projectPath"></span>/</div>
-		<div>git branch</div>
-		<div>git pull</div>
-
-		<div>gradle_file="app/build.gradle<span id="gradleSuffix"></span>"</div>
-		<div>name_line=$(grep -E "versionName" "$gradle_file")</div>
-		<div>versionName=$(echo "$name_line" | awk -F '"' '{print $2}')</div>
-		<div>code_line=$(grep -E "versionCode" "$gradle_file")</div>
-		<div>versionCode=$(echo "$code_line" | awk -F "<span class="gradleType"></span>" '{print $2}')</div>
-		<div>fileName="<span class="projectCode"></span>-$versionName-v$versionCode-release"</div>
-		<div>echo "$fileName"</div>
-		<div>cp -rf <span class="configPath"></span> <span class="projectPath"></span>/</div>
-		<div>sh gradlew clean app:bundle<span class="upperFlavor"></span>Release</div>
-		<div>cd app/build/outputs/bundle/<span class="lowerFlavor"></span>Release/</div>
-		<div>mv app-prop-release.aab $fileName.aab</div>
-		<div>zip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map -O <span class="savePath"></span>/$fileName-proguard.map</div>
-		<div>zip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map</div>
-		<div>zip -rP <span class="zipPwd"></span> <span class="savePath"></span>/$fileName.zip $fileName.aab</div>
-		<!-- <div>cat /usr/games/bptrackhealth/prop/prop/assets/remote.json</div> -->
-	</div>
+	<div id="shell"></div>
 	<script type="text/javascript">
 		function formatShell() {
+			var bundle = `#!/bin/sh\nset -e\ncd #projectPath#/\ngit branch\ngit pull\n\ngradle_file="app/build.gradle#gradleSuffix#"\nname_line=$(grep -E "versionName" "$gradle_file")\nversionName=$(echo "$name_line" | awk -F '"' '{print $2}')\ncode_line=$(grep -E "versionCode" "$gradle_file")\nversionCode=$(echo "$code_line" | awk -F "#gradleType#" '{print $2}')\nfileName="#projectCode#-$versionName-v$versionCode-release"\necho "$fileName"\ncp -rf #configPath# #projectPath#/\nsh gradlew clean app:bundle#upperFlavor#Release\ncd app/build/outputs/bundle/#lowerFlavor#Release/\nmv app-prop-release.aab $fileName.aab\nzip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map -O #savePath#/$fileName-proguard.map\nzip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map\nzip -rP #zipPwd# #savePath#/$fileName.zip $fileName.aab`
 			for (e of $('#form-bundle').serializeArray()) {
 				if (e.value == '') {
 					alert(e.name+'为空')
 					return false
 				}
-				$('.'+e.name).html(e.value)
 				if (e.name == 'gradleType') {
 					if (e.value == 1) {
-						$('#gradleSuffix').html('')
-						$('.'+e.name).html(" ")
+						bundle = bundle.replaceAll("#gradleSuffix#", '')
+							.replaceAll("#"+e.name+"#", ' ')
 					} else {
-						$('#gradleSuffix').html('.kts')
-						$('.'+e.name).html("= ")
+						bundle = bundle.replaceAll("#gradleSuffix#", '.kts')
+							.replaceAll("#"+e.name+"#", '= ')
 					}
 				} else if (e.name == 'flavorName') {
-					$('.upperFlavor').html(e.value.charAt(0).toUpperCase() + e.value.slice(1))
-					$('.lowerFlavor').html(e.value.charAt(0).toLowerCase() + e.value.slice(1))
+					bundle = bundle.replaceAll("#upperFlavor#", e.value.charAt(0).toUpperCase() + e.value.slice(1))
+						.replaceAll("#lowerFlavor#", e.value.charAt(0).toLowerCase() + e.value.slice(1))
+				} else {
+					bundle = bundle.replaceAll("#"+e.name+"#", e.value)
 				}
 			}
-			$('#shell')[0].style['display'] = 'block'
+			$('#shell').html(bundle)
 			return true
 		}
 		$("#form-bundle").submit(function(e) {
