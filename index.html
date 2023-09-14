@@ -88,7 +88,8 @@
 		    </li>
 		    <li>
 		    	<span class="config-rootFolder-name"></span>.gradle.kts
-		    	<select id="config-algorithm"><option value="">不加密</option><option>AES</option><option>DES</option></select>
+		    	<select id="config-encrypt-mode"><option value="">不加密</option><option>不带iv偏移</option><option>带iv偏移</option></select>
+		    	<input id="config-algorithm" type="text" placeholder="AES" />
 		    	<input id="config-transformation" type="text" placeholder="AES/ECB/PKCS5Padding" />
 		    	<input id="config-key" type="text" placeholder="key" />
 		    	<input id="config-iv" type="text" placeholder="iv" />
@@ -236,16 +237,17 @@
 			var gradle_noiv = '\n\nfun encryptFile(orgin: File, target: File) {\n    try {\n        val key = "#key#"\n        val keySpec = SecretKeySpec(key.toByteArray(), "#algorithm#")\n        val cipher = Cipher.getInstance("#transformation#")\n        cipher.init(Cipher.ENCRYPT_MODE, keySpec)\n        FileOutputStream(target).use {\n            it.write(cipher.doFinal(orgin.readBytes()))\n            it.flush()\n        }\n    } catch (e: Exception) {\n        e.printStackTrace()\n    }\n}'
 			var gradle_iv = '\n\nfun encryptFile(orgin: File, target: File) {\n    try {\n        val key = "#key#"\n        val iv = "#iv#"\n        val keySpec = SecretKeySpec(key.toByteArray(), "#algorithm#")\n        val ivSpec = IvParameterSpec(iv.toByteArray())\n        val cipher = Cipher.getInstance("#transformation#")\n        cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)\n        FileOutputStream(target).use {\n            it.write(cipher.doFinal(orgin.readBytes()))\n            it.flush()\n        }\n    } catch (e: Exception) {\n        e.printStackTrace()\n    }\n}'
 			var gradle_noEncrypt = '\n\nfun encryptFile(orgin: File, target: File) {\n    orgin.copyTo(target)\n}'
+			var encryptMode = $("#config-encrypt-mode")[0].value
 			var algorithm = $("#config-algorithm")[0].value
 			var transformation = $("#config-transformation")[0].value
 			var key = $("#config-key")[0].value
 			var iv = $("#config-iv")[0].value
-			if (algorithm == 'AES') {
+			if (encryptMode == '不带iv偏移') {
 				gradle_noiv = gradle_noiv.replace("#algorithm#", algorithm)
 				gradle_noiv = gradle_noiv.replace("#transformation#", transformation)
 				gradle_noiv = gradle_noiv.replace("#key#", key)
 				gradle_kts += gradle_noiv
-			} else if (algorithm == 'DES') {
+			} else if (encryptMode == '带iv偏移') {
 				gradle_iv = gradle_iv.replace("#algorithm#", algorithm)
 				gradle_iv = gradle_iv.replace("#transformation#", transformation)
 				gradle_iv = gradle_iv.replace("#key#", key)
