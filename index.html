@@ -94,7 +94,10 @@
 		    	<input id="config-key" type="text" placeholder="key" />
 		    	<input id="config-iv" type="text" placeholder="iv" />
 		    </li>
-		    <li><span class="config-rootFolder-name"></span>.properties</li>
+		    <li>
+		    	<span class="config-rootFolder-name"></span>.properties
+		    	<div><textarea type="text" id="config-properties" placeholder="自定义参数key=value"></textarea></div>
+		    </li>
 	    </ul>
 	</ul>
 	<div>忽略规则</div>
@@ -258,13 +261,14 @@
 			}
 			rootFolder.file(rootFolderName+".gradle.kts", string2blob(gradle_kts))
 
-			var properties = 'keystore=../###/###\nstorePwd=###\nkeyName=###\nkeyPwd=###\n\nflavor=###'
+			var properties = 'keystore=../###/###\nstorePwd=###\nkeyName=###\nkeyPwd=###\n\nflavor=###\n\n'
 				.replace('###', rootFolderName)
 				.replace('###', configFiles.configFileSign[0].name)
 				.replace('###', $("#config-store-pwd")[0].value)
 				.replace('###', $("#config-alias")[0].value)
 				.replace('###', $("#config-key-pwd")[0].value)
 				.replace('###', flavorFolderName)
+			properties += $("#config-properties")[0].value.trim()
 			rootFolder.file(rootFolderName+".properties", string2blob(properties))
 
 
