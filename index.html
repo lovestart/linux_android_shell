@@ -81,13 +81,13 @@
 
 		$(document).ready(function() {
 			$("input[type=text]").on("click", function(event) {
-				console.log(event)
 				if (event.altKey) {
 					randomWord(this)
 				}
 			})
 		})
 	</script>
+	<div style="float: right; color: #999;">alt+鼠标左键  随机生成变量名</div>
 	<h2>配置文件夹</h2>
 	<ul class="domtree">
 		<input type="text" id="config-rootFolder" placeholder="根目录名称">
