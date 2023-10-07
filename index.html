@@ -6,8 +6,9 @@
 	<title>脚本生成器</title>
 	<script src="https://cdn.jsdelivr.net/npm/jquery"></script>
 	<script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
-
     <script type="text/javascript" src="https://stuk.github.io/jszip-utils/dist/jszip-utils.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <style type="text/css">
     	ul.domtree,
 		ul.domtree ul {
@@ -52,6 +53,41 @@
     </style>
 </head>
 <body>
+	<script type="text/javascript">
+		toastr.options.positionClass = "toast-top-center"
+		function randomWord(inputObj) {
+			$.ajax({
+		      url: "https://random-word-api.herokuapp.com/word?length="+Math.floor(4 + Math.random() * 4),
+		      method: "GET",
+		      dataType: "json",
+		      success: function(data) {
+		      	var result = data.toString()
+		      	console.log(result)
+		        // 请求成功，处理响应数据
+		        if (/^[a-z]+$/.test(result.toLowerCase())) {
+		        	toastr.success("随机生成="+result)
+		        	inputObj.value = result
+		        } else {
+					toastr.success("随机生成异常="+result)
+		        }
+		      },
+		      error: function(xhr, status, error) {
+		        // 请求失败，处理错误
+		        toastr.error("随机生成失败")
+		        console.log("请求失败，状态码：" + xhr.status + "，错误信息：" + error);
+		      }
+		    });
+		}
+
+		$(document).ready(function() {
+			$("input[type=text]").on("click", function(event) {
+				console.log(event)
+				if (event.altKey) {
+					randomWord(this)
+				}
+			})
+		})
+	</script>
 	<h2>配置文件夹</h2>
 	<ul class="domtree">
 		<input type="text" id="config-rootFolder" placeholder="根目录名称">
@@ -181,12 +217,12 @@
 		$("#download-config").on("click", function() {
 			var rootFolderName = $("#config-rootFolder")[0].value
 			if (rootFolderName == '') {
-				alert("没有输入根目录名称")
+				toastr.error("没有输入根目录名称")
 				return
 			}
 			var flavorFolderName = $("#config-flavorName")[0].value
 			if (flavorFolderName == '') {
-				alert("没有输入flavor名称")
+				toastr.error("没有输入flavor名称")
 				return
 			}
 
@@ -217,7 +253,7 @@
 		    var xmlFolder = flavorFolder.folder("res").folder("xml")
 
 		    if (!insertFile(rootFolder, "configFileSign")) {
-				alert("没有上传签名文件")
+				toastr.error("没有上传签名文件")
 		    	return
 		    }
 		    if ($("#config-dev-google-json")[0].checked) {
@@ -226,7 +262,7 @@
 		    	flavorFolder.file("google-services.json", string2blob(googleJson))
 		    } else {
 			    if (!insertFile(flavorFolder, "configFileGoogle")) {
-					alert("没有上传google-services.json")
+					toastr.error("没有上传google-services.json")
 			    	return
 			    }
 		    }
@@ -317,7 +353,7 @@
 			var bundle = `#!/bin/sh\nset -e\ncd #projectPath#/\ngit branch\ngit pull\n\ngradle_file="app/build.gradle#gradleSuffix#"\nname_line=$(grep -E "versionName" "$gradle_file")\nversionName=$(echo "$name_line" | awk -F '"' '{print $2}')\ncode_line=$(grep -E "versionCode" "$gradle_file")\nversionCode=$(echo "$code_line" | awk -F "#gradleType#" '{print $2}')\nfileName="#projectCode#-$versionName-v$versionCode-release"\necho "$fileName"\ncp -rf #configPath# #projectPath#/\nsh gradlew clean app:bundle#upperFlavor#Release\ncd app/build/outputs/bundle/#lowerFlavor#Release/\nmv app-prop-release.aab $fileName.aab\nzip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map -O #savePath#/$fileName-proguard.map\nzip -d $fileName.aab BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map\nzip -rP #zipPwd# #savePath#/$fileName.zip $fileName.aab`
 			for (e of $('#form-bundle').serializeArray()) {
 				if (e.value == '') {
-					alert(e.name+'为空')
+					toastr.error(e.name+'为空')
 					return false
 				}
 				if (e.name == 'gradleType') {
@@ -392,14 +428,14 @@
 	        tempTextarea.remove();
 	        
 	        // 提示用户复制成功
-	        alert('复制成功');
+	        toastr.success('复制成功');
 		}
 		function formatShellPreviewSign() {
 			//keytool -exportcert -alias android -keystore sign.keystore -storepass android | openssl sha1 -binary | openssl base64
 			var templeate = "keytool -exportcert -alias *** -keystore *** -storepass *** | openssl sha1 -binary | openssl base64"
 			for (e of $('#form-preview-sign').serializeArray()) {
 				if (e.value == '') {
-					alert(e.name+'为空')
+					toastr.error(e.name+'为空')
 					return false
 				}
 				templeate = templeate.replace("***", e.value)
@@ -435,7 +471,7 @@
 			var templeate = "keytool -genkeypair -v -alias *** -keyalg RSA -keysize 2048 -validity 36500 -keypass *** -keystore *** -storepass ***"
 			for (e of $('#form-generate-sign').serializeArray()) {
 				if (e.value == '') {
-					alert(e.name+'为空')
+					toastr.error(e.name+'为空')
 					return false
 				}
 				templeate = templeate.replace("***", e.value)
@@ -472,7 +508,7 @@
 			var templeate = "java -jar *** --keystore=*** --alias=*** --output=*** --include-cert --rsa-aes-encryption --encryption-key-path=***"
 			for (e of $('#form-generate-output').serializeArray()) {
 				if (e.value == '') {
-					alert(e.name+'为空')
+					toastr.error(e.name+'为空')
 					return false
 				}
 				templeate = templeate.replace("***", e.value)
