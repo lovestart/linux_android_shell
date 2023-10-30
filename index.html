@@ -527,5 +527,41 @@
 		})
 	</script>
 	
+
+	<h2>删除压缩包的系统文件</h2>
+	<input type="file" id="delete-os-zip" accept=".zip" />
+	<script type="text/javascript">
+		function deleteOSFile(zipFile) {
+			var jszip = new JSZip()
+			jszip.loadAsync(zipFile)
+				.then(function(result) {
+					var temp = null
+					for (key in result.files) {
+						temp = result.files[key]
+						if (temp.name.indexOf("DS_Store") != -1
+							|| temp.name.indexOf("__MACOSX") != -1) {
+							console.log("delete file: "+temp.name)
+							result.remove(key)
+						}
+					}
+					return jszip.generateAsync({ type: "blob" })
+				})
+				.then(function(blob) {
+					// 创建一个下载链接
+				    var link = document.createElement("a");
+				    link.href = URL.createObjectURL(blob);
+				    link.download = zipFile.name; // 设置下载文件的名称
+
+				    // 触发点击下载链接
+				    link.click();
+					document.body.removeChild(link);
+				})
+
+		}
+		$("#delete-os-zip").on("change", function(event) {
+			deleteOSFile(event.target.files[0])
+		})
+	</script>
+
 </body>
 </html>
