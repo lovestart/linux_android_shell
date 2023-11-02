@@ -337,12 +337,12 @@
 	<h2>生成打包脚本</h2>
 	<form id="form-bundle">
 		项目代号：<input type="text" name="projectCode" placeholder="mt01"><br />
-		项目路径：<input type="text" name="projectPath" placeholder="/usr/games"><br />
-		配置路径：<input type="text" name="configPath" placeholder="/usr/games"><br />
+		项目路径：<input type="text" name="projectPath" placeholder="/usr/games/project"><br />
+		配置路径：<input type="text" name="configPath" placeholder="/home/ubuntu/shell"><br />
 		gradle类型：<select name="gradleType"><option value="0">*.gradle.kts</option><option value="1">*.gradle</option></select><br />
 		flavor名称：<input type="text" name="flavorName" placeholder="flaovorName"><br />
 		zip密码：<input type="text" name="zipPwd" placeholder="123456"><br />
-		保存路径：<input type="text" name="savePath" placeholder="/home/ubuntu"><br />
+		保存路径：<input type="text" name="savePath" placeholder="/home/ubuntu/bundleZip"><br />
 		<input type="reset" value="清空" />
 		<input type="submit" value="预览" />
 		<input type="button" id="download" value="下载" />
@@ -403,7 +403,7 @@
 	<h2>查看签名的哈希散列base64编码</h2>
 	<form id="form-preview-sign">
 		alias：<input type="text" name="alias" placeholder="alias"><br />
-		签名路径：<input type="text" name="keystorePath" placeholder="../sign.keystore"><br />
+		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
 		storePass：<input type="text" name="keystorePwd" placeholder="123456"><br />
 		<input type="submit" value="生成" />
 		<input type="button" id="btn-preview-sign" value="复制" />
@@ -459,7 +459,7 @@
 	<form id="form-generate-sign">
 		alias：<input type="text" name="alias" placeholder="alias"><br />
 		keyPass：<input type="text" name="keyPwd" placeholder="123456"><br />
-		签名路径：<input type="text" name="keystorePath" placeholder="../sign.keystore"><br />
+		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
 		storePass：<input type="text" name="keystorePwd" placeholder="123456"><br />
 		<input type="submit" value="生成" />
 		<input type="button" id="btn-generate-sign" value="复制" />
@@ -494,7 +494,7 @@
 	<h2>生成play store上架output.zip</h2>
 	<form id="form-generate-output">
 		pepk.jar路径：<input type="text" name="alias" value="pepk.jar" placeholder="默认在执行的文件夹中"><br />
-		签名路径：<input type="text" name="keystorePath" placeholder="../sign.keystore"><br />
+		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
 		alias：<input type="text" name="alias" placeholder="alias"><br />
 		生成output.zip路径：<input type="text" name="alias" value="output.zip" placeholder="默认生成在执行的文件夹中"><br />
 		加密公钥路径：<input type="text" name="keystorePwd" value="encryption_public_key.pem" placeholder="默认在执行的文件夹中"><br />
