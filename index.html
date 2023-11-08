@@ -50,6 +50,12 @@
 		div {
 			white-space: pre-wrap;
 		}
+		h2 {
+	      transition: background-color 0.5s;
+		}
+		.highlighted {
+	      background-color: yellow;
+	    }
     </style>
 </head>
 <body>
@@ -85,10 +91,24 @@
 					randomWord(this)
 				}
 			})
+			// 获取当前链接中的锚点
+		    var currentAnchor = window.location.hash;
+
+		    // 根据当前锚点添加高亮效果
+		    if (currentAnchor) {
+		      var targetElement = document.querySelector(currentAnchor);
+		      if (targetElement) {
+		        targetElement.classList.add("highlighted");
+		        // 移除高亮效果以便下次触发过渡效果
+		        setTimeout(function() {
+		          targetElement.classList.remove("highlighted");
+		        }, 3000); // 1秒后移除高亮效果
+		      }
+		    }
 		})
 	</script>
 	<div style="float: right; color: #999;">alt+鼠标左键  随机生成变量名</div>
-	<h2>配置文件夹</h2>
+	<h2 id="h2-domtree">配置文件夹</h2>
 	<ul class="domtree">
 		<input type="text" id="config-rootFolder" placeholder="根目录名称">
 	    <ul>
@@ -334,7 +354,7 @@
 			  });
 		})
 	</script>
-	<h2>生成打包脚本</h2>
+	<h2 id="h2-bundle">生成打包脚本</h2>
 	<form id="form-bundle">
 		项目代号：<input type="text" name="projectCode" placeholder="mt01"><br />
 		项目路径：<input type="text" name="projectPath" placeholder="/usr/games/project"><br />
@@ -400,7 +420,7 @@
 	</script>
 
 
-	<h2>查看签名的哈希散列base64编码</h2>
+	<h2 id="h2-preview-sign">查看签名的哈希散列base64编码</h2>
 	<form id="form-preview-sign">
 		alias：<input type="text" name="alias" placeholder="alias"><br />
 		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
@@ -455,7 +475,7 @@
 	</script>
 
 
-	<h2>生成签名文件keystore</h2>
+	<h2 id="h2-generate-sign">生成签名文件keystore</h2>
 	<form id="form-generate-sign">
 		alias：<input type="text" name="alias" placeholder="alias"><br />
 		keyPass：<input type="text" name="keyPwd" placeholder="123456"><br />
@@ -491,7 +511,7 @@
 	</script>
 
 
-	<h2>生成play store上架output.zip</h2>
+	<h2 id="h2-generate-output">生成play store上架output.zip</h2>
 	<form id="form-generate-output">
 		pepk.jar路径：<input type="text" name="alias" value="pepk.jar" placeholder="默认在执行的文件夹中"><br />
 		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
@@ -528,7 +548,8 @@
 	</script>
 	
 
-	<h2>删除压缩包的系统文件</h2>
+	<h2 id="h2-delete-os-zip">删除压缩包的系统文件</h2>
+	<div id="log-delete-os-zip"></div>
 	<input type="file" id="delete-os-zip" accept=".zip" />
 	<script type="text/javascript">
 		function deleteOSFile(zipFile) {
@@ -541,6 +562,7 @@
 						if (temp.name.indexOf("DS_Store") != -1
 							|| temp.name.indexOf("__MACOSX") != -1) {
 							console.log("delete file: "+temp.name)
+							$("#log-delete-os-zip").append("<p>delete file: "+temp.name+"</p>")
 							result.remove(key)
 						}
 					}
@@ -562,6 +584,13 @@
 			deleteOSFile(event.target.files[0])
 		})
 	</script>
-
+	<h2 id="h2-shell-entrance">脚本入口</h2>
+	<div id="copy-shell-entrance">/bin/bash -c "$(curl -fsSL https://github.com/hzl000/shell/releases/download/v1.0.0/entrance.sh)"</div>
+	<input type="button" id="btn-shell-entrance" value="复制" />
+	<script type="text/javascript">
+		$("#btn-shell-entrance").on("click", function() {
+			copyText($('#copy-shell-entrance').text())
+		})
+	</script>
 </body>
 </html>
