@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- saved from url=(0033)https://www.bejson.com/ui/lottie/ -->
+<html class="os-mac screen-desktop-wide device-desktop">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=0,user-scalable=yes,maximum-scale=1.0">
+		<title>
+			lottie动画在线预览 - bejson在线工具
+		</title>
+		<link rel="stylesheet" type="text/css" href="./static/global.min.css">
+		<link rel="stylesheet" type="text/css" href="./static/lottie.css">
+	</head>
+	<body class="load-indicator" data-loading="上传中，请稍候..." data-siteid="2" style="padding: 0px 0px 120px;">
+		<div class="container t-small-margin">
+			<h1 class="font-18 v-big-margin no-padding-v">
+				lottie动画在线预览
+			</h1>
+			<div class="container t-small-margin">
+				<div class="editor-box2">
+					<div class="relative">
+						<!-- 功能 -->
+						<div class="t-huge-margin">
+							<div class="btn-group">
+								<button onclick="$(&#39;#uploadFile&#39;).click();" class="btn" style="
+								border-radius: 5px;
+								">
+									上传
+								</button>
+								<button id="lottie_demo" class="btn" style="
+								border-radius: 5px;margin-left:6px;
+								">
+									来个DEMO
+								</button>
+							</div>
+							<div class="btn-group" style="
+							margin-left: 22px;
+							">
+								<span style="display: none">
+									<input type="file" class="btn btn-primary" id="uploadFile" accept=".json"
+									onchange="loadJson(event)">
+								</span>
+								<button onclick="OnToggle()" id="play_btn" class="btn" style="border-radius: 5px;min-width: 170px;">
+									播放 / 暂停
+								</button>
+							</div>
+							<div class="" style="
+							display: none;
+							">
+								<span id="maxFrames" style="display: inline-block"></span>
+							</div>
+							<div class="input-group" style="margin:5px 0;display: inline-block;/* width: 190px; */margin-left: 22px;margin-right: 0;">
+								<span class="input-group-addon" style="
+								width: 46px;
+								display: inline-block;
+								height: 32px;
+								line-height: 17px;
+								background-color: #f2f2f2;
+								">
+									跳至
+								</span>
+								<input type="number" id="targetFrame" style="width:60px;outline: none;display: inline-block;margin: 0 -4px;background-color: #fff;border-radius: 0;"
+								min="1" value="1" class="btn" onchange="gotoFrame()">
+								<span class="input-group-addon" style="
+								width: 43px;
+								display: inline-block;
+								height: 32px;
+								line-height: 17px;
+								background-color: #f2f2f2;
+								">
+									帧
+								</span>
+							</div>
+							<div class="btn-group" style="
+							margin-left: 22px;
+							">
+								<button onclick="saveSVG()" class="btn " style="
+								border-radius: 5px 0 0 5px;
+								">
+									保存为svg
+								</button>
+								<button onclick="savePNG()" class="btn " style="
+								border-radius: 0 5px 5px 0;
+								">
+									保存为png
+								</button>
+							</div>
+							<div class="input-group" style="margin: 5px 0;display: inline-block;width: 209px;margin-left: 22px;">
+								<span class="input-group-addon" style="
+								width: 64px;
+								display: inline-block;
+								height: 32px;
+								line-height: 17px;
+								background-color: #f2f2f2;
+								">
+									背景色
+								</span>
+								<input type="text" class="btn" placeholder="hex" value="#00000000" id="getVHex"
+								style="
+								width: 100px;
+								outline: none;
+								display: inline-block;
+								margin: 0 -4px;
+								background-color: #fff;
+								border-radius: 0;
+								">
+								<span class="input-group-addon" id="colorpk" style="width: 43px; display: inline-block; height: 32px; line-height: 17px; background-color: #00000000;"></span>
+							</div>
+						</div>
+					</div>
+					<div class="float-left relative">
+						<div>
+							<input type="range" id="progress-bar" min="1" max="1" step="1" value="1"
+							style="width: 100%;">
+						</div>
+						<div id="lottie"></div>
+					</div>
+					<div class="float-right relative loinfo">
+						<p id="info"></p>
+					</div>
+					<div style="clear: both;"></div>
+				</div>
+				<div>
+					<span>
+						<span style="color: MediumVioletRed;">
+							<b>
+								提示：本工具基于浏览器来读取数据，文件不会上传至我们的服务器，请放心使用！
+							</b>
+						</span>
+						<br>
+						<span style="color: SlateGray;">
+							<b>
+								功能介绍：
+							</b>
+							<br>
+							lottie是一个动画效果框架，动画使用json格式进行保存，本工具可以快速预览，十分方便。
+						</span>
+					</span>
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="./static/global.min.js"></script>
+		<script type="text/javascript" src="./static/lottie.lib.js"></script>
+		<script type="text/javascript" src="./static/lottie.js"></script>
+	</body>
+
+</html>

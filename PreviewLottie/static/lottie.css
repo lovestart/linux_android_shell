@@ -1,0 +1,44 @@
+#lottie{
+    width: 950px;height: 500px;
+    border: solid 1px #eee;
+    float: left;
+    background-position: 0 0,10px 10px!important;
+    background-size: 20px 20px!important;
+    position: relative;
+    background-image: linear-gradient(45deg,#eee 25%,transparent 25%,transparent 75%,#eee 75%,#eee 100%),linear-gradient(45deg,#eee 25%,#fff 25%,#fff 75%,#eee 75%,#eee 100%)!important;
+    overflow: hidden;
+}
+
+#lottie>svg{
+    background-color: #f4f4f4;
+}
+
+
+.loinfo{
+    width: 200px;height: 520px;
+    border: solid 1px #eee;
+}
+
+#info{
+    margin: 10px;
+    line-height: 1.8;
+}
+
+#maxFrames{
+    margin: 6px 11px;
+}
+
+
+.color-table {
+    display: none;
+    position: fixed;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    /* 设置其他样式，根据需要自行调整 */
+    z-index: 11;
+}
+
+#showColorBox td{
+    cursor: pointer;
+}
