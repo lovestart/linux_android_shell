@@ -59,6 +59,14 @@
     </style>
 </head>
 <body>
+	<h2 id="h2-shell-entrance">脚本入口</h2>
+	<div id="copy-shell-entrance">/bin/bash -c "$(curl -fsSL https://github.com/hzl000/shell/releases/download/v1.0.0/entrance.sh)"</div>
+	<input type="button" id="btn-shell-entrance" value="复制" />
+	<script type="text/javascript">
+		$("#btn-shell-entrance").on("click", function() {
+			copyText($('#copy-shell-entrance').text())
+		})
+	</script>
 	<script type="text/javascript">
 		toastr.options.positionClass = "toast-top-center"
 		function randomWord(inputObj) {
@@ -149,10 +157,10 @@
 		    <li>
 		    	<span class="config-rootFolder-name"></span>.gradle.kts
 		    	<select id="config-encrypt-mode"><option value="">不加密</option><option>不带iv偏移</option><option>带iv偏移</option></select>
-		    	<input id="config-algorithm" type="text" placeholder="AES" />
-		    	<input id="config-transformation" type="text" placeholder="AES/ECB/PKCS5Padding" />
-		    	<input id="config-key" type="text" placeholder="key" />
-		    	<input id="config-iv" type="text" placeholder="iv" />
+		    	<input id="config-algorithm" type="text" placeholder="AES" hidden />
+		    	<input id="config-transformation" type="text" placeholder="AES/ECB/PKCS5Padding" hidden />
+		    	<input id="config-key" type="text" placeholder="key" hidden />
+		    	<input id="config-iv" type="text" placeholder="iv" hidden />
 		    </li>
 		    <li>
 		    	<span class="config-rootFolder-name"></span>.properties
@@ -173,6 +181,25 @@
 	<input type="button" id="download-config" value="下载" />
 	<script type="text/javascript">
 		var configFiles = {}
+		$("#config-encrypt-mode").on("change", function(event) {
+			var encryptMode = event.currentTarget.value
+			if (encryptMode == '不带iv偏移') {
+				$('#config-algorithm').show()
+				$('#config-transformation').show()
+				$('#config-key').show()
+				$('#config-iv').hide()
+			} else if (encryptMode == '带iv偏移') {
+				$('#config-algorithm').show()
+				$('#config-transformation').show()
+				$('#config-key').show()
+				$('#config-iv').show()
+			} else {
+				$('#config-algorithm').hide()
+				$('#config-transformation').hide()
+				$('#config-key').hide()
+				$('#config-iv').hide()
+			}
+		})
 		$("input[id^='configFile']").on("change", function(event) {
 			configFiles[event.currentTarget.id] = event.target.files;
 		})
@@ -245,6 +272,21 @@
 				toastr.error("没有输入flavor名称")
 				return
 			}
+			var flavorFolderName = $("#config-store-pwd")[0].value
+			if (flavorFolderName == '') {
+				toastr.error("没有输入store密码")
+				return
+			}
+			var flavorFolderName = $("#config-alias")[0].value
+			if (flavorFolderName == '') {
+				toastr.error("没有输入别名")
+				return
+			}
+			var flavorFolderName = $("#config-key-pwd")[0].value
+			if (flavorFolderName == '') {
+				toastr.error("没有输入key密码")
+				return
+			}
 
 			var rootIgnore = '/###'
 				.replace("###", rootFolderName)
@@ -277,6 +319,10 @@
 		    	return
 		    }
 		    if ($("#config-dev-google-json")[0].checked) {
+				if ($("#config-application-id")[0].value == '') {
+					toastr.error("没有输入包名")
+					return
+				}
 		    	var googleJson = '{\n  "project_info": {\n    "project_number": "myapp-project-123",\n    "project_id": "myapp-project-123",\n    "storage_bucket": "appspot.com"\n  },\n  "client": [\n    {\n      "client_info": {\n        "mobilesdk_app_id": "1:1234567890:android:321abc456def7890",\n        "android_client_info": {\n          "package_name": "###"\n        }\n      },\n      "oauth_client": [\n        {\n          "client_id": "apps.googleusercontent.com",\n          "client_type": 3\n        }\n      ],\n      "api_key": [\n        {\n          "current_key": "Abcdefghijklmnopqrstuvwxyz-abcdefghijkl"\n        }\n      ],\n      "services": {\n        "appinvite_service": {\n          "other_platform_oauth_client": [\n            {\n              "client_id": "apps.googleusercontent.com",\n              "client_type": 3\n            }\n          ]\n        }\n      }\n    }\n  ],\n  "configuration_version": "1"\n}'
 		    		.replace("###", $("#config-application-id")[0].value.trim())
 		    	flavorFolder.file("google-services.json", string2blob(googleJson))
@@ -347,7 +393,7 @@
 
 			    // 触发点击下载链接
 			    link.click();
-				document.body.removeChild(link);
+				$(link).remove()
 			  })
 			  .catch(function (error) {
 			    console.error("Error creating ZIP file:", error);
@@ -418,137 +464,10 @@
 			document.body.removeChild(downloadLink);
 		});
 	</script>
-
-
-	<h2 id="h2-preview-sign">查看签名的哈希散列base64编码</h2>
-	<form id="form-preview-sign">
-		alias：<input type="text" name="alias" placeholder="alias"><br />
-		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
-		storePass：<input type="text" name="keystorePwd" placeholder="123456"><br />
-		<input type="submit" value="生成" />
-		<input type="button" id="btn-preview-sign" value="复制" />
-	</form>
-	<div id="copy-preview-sign"></div>
-	<script type="text/javascript">
-		function copyText(content) {
-			// 创建一个临时的 textarea 元素，并设置其值为要复制的文本内容
-	        var tempTextarea = $('<textarea>');
-	        tempTextarea.val(content);
-	        
-	        // 将 textarea 添加到页面中
-	        $('body').append(tempTextarea);
-	        
-	        // 选中文本内容
-	        tempTextarea.select();
-	        
-	        // 复制文本内容到剪贴板
-	        document.execCommand('copy');
-	        
-	        // 移除临时的 textarea 元素
-	        tempTextarea.remove();
-	        
-	        // 提示用户复制成功
-	        toastr.success('复制成功');
-		}
-		function formatShellPreviewSign() {
-			//keytool -exportcert -alias android -keystore sign.keystore -storepass android | openssl sha1 -binary | openssl base64
-			var templeate = "keytool -exportcert -alias *** -keystore *** -storepass *** | openssl sha1 -binary | openssl base64"
-			for (e of $('#form-preview-sign').serializeArray()) {
-				if (e.value == '') {
-					toastr.error(e.name+'为空')
-					return false
-				}
-				templeate = templeate.replace("***", e.value)
-			}
-			$("#copy-preview-sign").html(templeate)
-			return true
-		}
-		$("#form-preview-sign").submit(function(e) {
-			e.preventDefault()
-			console.log(e)
-			formatShellPreviewSign()
-		})
-		$("#btn-preview-sign").on("click", function() {
-			if (!formatShellPreviewSign()) return
-			copyText($('#copy-preview-sign').text())
-		})
-	</script>
-
-
-	<h2 id="h2-generate-sign">生成签名文件keystore</h2>
-	<form id="form-generate-sign">
-		alias：<input type="text" name="alias" placeholder="alias"><br />
-		keyPass：<input type="text" name="keyPwd" placeholder="123456"><br />
-		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
-		storePass：<input type="text" name="keystorePwd" placeholder="123456"><br />
-		<input type="submit" value="生成" />
-		<input type="button" id="btn-generate-sign" value="复制" />
-	</form>
-	<div id="copy-generate-sign"></div>
-	<script type="text/javascript">
-		function formatShellGenerateSign() {
-			//keytool -genkeypair -v -alias android -keyalg RSA -keysize 2048 -validity 36500 -keypass android -keystore sign.keystore -storepass android
-			var templeate = "keytool -genkeypair -v -alias *** -keyalg RSA -keysize 2048 -validity 36500 -keypass *** -keystore *** -storepass ***"
-			for (e of $('#form-generate-sign').serializeArray()) {
-				if (e.value == '') {
-					toastr.error(e.name+'为空')
-					return false
-				}
-				templeate = templeate.replace("***", e.value)
-			}
-			$("#copy-generate-sign").html(templeate)
-			return true
-		}
-		$("#form-generate-sign").submit(function(e) {
-			e.preventDefault()
-			console.log(e)
-			formatShellGenerateSign()
-		})
-		$("#btn-generate-sign").on("click", function() {
-			if (!formatShellGenerateSign()) return
-			copyText($('#copy-generate-sign').text())
-		})
-	</script>
-
-
-	<h2 id="h2-generate-output">生成play store上架output.zip</h2>
-	<form id="form-generate-output">
-		pepk.jar路径：<input type="text" name="alias" value="pepk.jar" placeholder="默认在执行的文件夹中"><br />
-		签名路径：<input type="text" name="keystorePath" placeholder="sign.keystore"><br />
-		alias：<input type="text" name="alias" placeholder="alias"><br />
-		生成output.zip路径：<input type="text" name="alias" value="output.zip" placeholder="默认生成在执行的文件夹中"><br />
-		加密公钥路径：<input type="text" name="keystorePwd" value="encryption_public_key.pem" placeholder="默认在执行的文件夹中"><br />
-		<input type="submit" value="生成" />
-		<input type="button" id="btn-generate-output" value="复制" />
-	</form>
-	<div id="copy-generate-output"></div>
-	<script type="text/javascript">
-		function formatShellGenerateOutput() {
-			//java -jar pepk.jar --keystore=../app.keystore --alias=android --output=output.zip --include-cert --rsa-aes-encryption --encryption-key-path=encryption_public_key.pem
-			var templeate = "java -jar *** --keystore=*** --alias=*** --output=*** --include-cert --rsa-aes-encryption --encryption-key-path=***"
-			for (e of $('#form-generate-output').serializeArray()) {
-				if (e.value == '') {
-					toastr.error(e.name+'为空')
-					return false
-				}
-				templeate = templeate.replace("***", e.value)
-			}
-			$("#copy-generate-output").html(templeate)
-			return true
-		}
-		$("#form-generate-output").submit(function(e) {
-			e.preventDefault()
-			console.log(e)
-			formatShellGenerateOutput()
-		})
-		$("#btn-generate-output").on("click", function() {
-			if (!formatShellGenerateOutput()) return
-			copyText($('#copy-generate-output').text())
-		})
-	</script>
 	
 
-	<h2 id="h2-delete-os-zip">删除压缩包的系统文件</h2>
+	<h2 id="h2-delete-os-zip">删除压缩包的Mac系统文件</h2>
+	<span>直接压缩Mac系统的文件夹大概率会把关于文件夹的历史操作文件.DS_Store一起压缩进去，用这个工具可以快速清理这些文件</span>
 	<div id="log-delete-os-zip"></div>
 	<input type="file" id="delete-os-zip" accept=".zip" />
 	<script type="text/javascript">
@@ -576,7 +495,7 @@
 
 				    // 触发点击下载链接
 				    link.click();
-					document.body.removeChild(link);
+					$(link).remove();
 				})
 
 		}
@@ -584,14 +503,10 @@
 			deleteOSFile(event.target.files[0])
 		})
 	</script>
-	<h2 id="h2-shell-entrance">脚本入口</h2>
-	<div id="copy-shell-entrance">/bin/bash -c "$(curl -fsSL https://github.com/hzl000/shell/releases/download/v1.0.0/entrance.sh)"</div>
-	<input type="button" id="btn-shell-entrance" value="复制" />
-	<script type="text/javascript">
-		$("#btn-shell-entrance").on("click", function() {
-			copyText($('#copy-shell-entrance').text())
-		})
-	</script>
-	<a href="PreviewLottie/PreviewLottie.html" target="_blank">PreviewLottie</a>
+	
+	
+	<h2 id="h2-delete-os-zip">在线预览Lottie动画</h2>
+	<input type="button" value="预览" onclick="$('#lottie-web')[0].click()" />
+	<a id="lottie-web" hidden href="PreviewLottie/PreviewLottie.html" target="_blank">PreviewLottie</a>
 </body>
 </html>
