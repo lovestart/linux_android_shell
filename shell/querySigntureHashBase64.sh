@@ -35,5 +35,9 @@ while true; do
     fi
 done
 
-echo "alias=$alias store_password=$store_password file_path=$file_path"
+
+echo "即将执行的命令"
+echo "-----------------------"
+echo "keytool -exportcert -alias $alias -keystore $file_path -storepass $store_password | openssl sha1 -binary | openssl base64"
+echo "-----------------------"
 keytool -exportcert -alias "$alias" -keystore "$file_path" -storepass "$store_password" | openssl sha1 -binary | openssl base64

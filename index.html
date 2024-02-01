@@ -59,6 +59,28 @@
     </style>
 </head>
 <body>
+	<script type="text/javascript">
+		function copyText(content) {
+			// 创建一个临时的 textarea 元素，并设置其值为要复制的文本内容
+	        var tempTextarea = $('<textarea>');
+	        tempTextarea.val(content);
+	        
+	        // 将 textarea 添加到页面中
+	        $('body').append(tempTextarea);
+	        
+	        // 选中文本内容
+	        tempTextarea.select();
+	        
+	        // 复制文本内容到剪贴板
+	        document.execCommand('copy');
+	        
+	        // 移除临时的 textarea 元素
+	        tempTextarea.remove();
+	        
+	        // 提示用户复制成功
+	        toastr.success('复制成功');
+		}
+	</script>
 	<h2 id="h2-shell-entrance">脚本入口</h2>
 	<div id="copy-shell-entrance">/bin/bash -c "$(curl -fsSL https://github.com/hzl000/shell/releases/download/v1.0.0/entrance.sh)"</div>
 	<input type="button" id="btn-shell-entrance" value="复制" />
