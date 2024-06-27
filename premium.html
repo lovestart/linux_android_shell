@@ -263,7 +263,7 @@
                     '</tr>'
                 )
             }
-            var cookieJson = $.cookie('premium_json')
+            var cookieJson = localStorage.getItem('premium_json')
             if (!cookieJson || cookieJson == "") {
                 $('#myTextarea').text(content)
             } else {
@@ -272,7 +272,7 @@
 
             $('#myTextarea').on('input', function() {
                 updateView()
-                var result = $.cookie('premium_json', $("#myTextarea").val(), { expires: 30, path: '/' });
+                var result = localStorage.setItem('premium_json', $("#myTextarea").val())
                 console.log(result)
             });
             $('#show-demo').on('input', function() {
