@@ -1,0 +1,456 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>订阅配置</title>
+    <script src="https://cdn.jsdelivr.net/npm/jquery"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <style type="text/css">
+        #myTextarea {
+            width: 100%;
+            height: 500px;
+        }
+        .product-view {
+            border: 5px solid black;
+            border-radius: 50px;
+            padding: 10px;
+        }
+        .circle {
+            border-radius: 50px;
+            border: 2px solid blue;
+            margin-right: 10px;
+            width: 30px;
+            height: 30px;
+        }
+        .sub-text {
+            color: #A1A1A1;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-1 {
+            flex: 1;
+        }
+        .flex-center-ver {
+            align-items: center;
+        }
+        .btn {
+            background: blue;
+            color: white;
+            margin: 10px;
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .big-color {
+            color: blue;
+            font-size: 26px;
+        }
+        .error {
+            padding: 3px 10px;
+            background: red;
+            border-radius: 30px;
+            color: white;
+        }
+        .text-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex">
+        <div class="flex-1" style="max-width: 50%;">
+            <table id="form-placeholder" border="1">
+                <tr>
+                    <th>占位符</th>
+                    <th>解释</th>
+                    <th>演示数值<input id="show-demo" type="checkbox" /></th>
+                </tr>
+            </table>
+            <table id="form-json" border="1" style="max-width: 400px;">
+                <tr>
+                    <th>字段</th>
+                    <th>解释</th>
+                </tr>
+            </table>
+            <div id="json-error"></div>
+            <textarea id="myTextarea" rows="1"></textarea>
+        </div>
+        <div>
+            <h1 id="loss-id"></h1>
+            <h1>订阅页</h1>
+            <div class="product-view flex flex-center-ver">
+                <span class="circle"></span>
+                <div>
+                    <div class="offer-title-nature"></div>
+                    <div class="offer-desc-nature"></div>
+                </div>
+                <div class="btn-nature btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">nature-有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <span class="circle"></span>
+                <div>
+                    <div class="title-nature"></div>
+                    <div class="desc-nature"></div>
+                </div>
+                <div class="btn-nature btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">nature-没有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <span class="circle"></span>
+                <div>
+                    <div class="offer-title-normal1"></div>
+                    <div class="offer-desc-normal1"></div>
+                </div>
+                <div class="btn-normal1 btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">normal1-有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <span class="circle"></span>
+                <div>
+                    <div class="title-normal1"></div>
+                    <div class="desc-normal1"></div>
+                </div>
+                <div class="btn-normal1 btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">normal1-没有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <span class="circle"></span>
+                <div>
+                    <div class="title-normal2"></div>
+                </div>
+                <div class="btn-normal2 btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">normal2</div>
+            </div>
+            <h1>转盘</h1>
+            <div class="product-view flex flex-center-ver">
+                <div class="text-center">
+                    <div class="offer-title-turntable"></div>
+                    <div class="offer-desc-turntable"></div>
+                    <div class="btn-turntable btn"></div>
+                </div>
+                <div class="flex-1"></div>
+                <div class="sub-text">turntable-有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <div class="text-center">
+                    <div class="title-turntable"></div>
+                    <div class="desc-turntable"></div>
+                    <div class="btn">Continue</div>
+                </div>
+                <div class="flex-1"></div>
+                <div class="sub-text">turntable-没有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <div class="text-center">
+                    <div class="offer-title-gift"></div>
+                    <div class="offer-desc-gift"></div>
+                    <div class="btn-gift btn"></div>
+                </div>
+                <div class="flex-1"></div>
+                <div class="sub-text">gift-有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <div class="text-center">
+                    <div class="title-gift"></div>
+                    <div class="desc-gift"></div>
+                    <div class="btn">Continue</div>
+                </div>
+                <div class="flex-1"></div>
+                <div class="sub-text">gift-没有优惠资格</div>
+            </div>
+            <h1>新人优惠</h1>
+            <div class="product-view flex flex-center-ver">
+                <div class="text-center">
+                    <div class="title-newDay1"></div>
+                    <div class="flex">
+                        <div class="desc-newDay1"></div>
+                        <div class="offer-newDay1"></div>
+                    </div>
+                    <div class="btn-newDay1 btn"></div>
+                </div>
+                <div class="flex-1"></div>
+                <div class="sub-text">newDay1</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <div class="text-center">
+                    <div class="title-newDay2"></div>
+                    <div class="flex">
+                        <div class="desc-newDay2"></div>
+                        <div class="offer-newDay2"></div>
+                    </div>
+                    <div class="btn-newDay2 btn"></div>
+                </div>
+                <div class="flex-1"></div>
+                <div class="sub-text">newDay2</div>
+            </div>
+            <h1>老用户</h1>
+            <div class="product-view flex flex-center-ver">
+                <div class="text-center">
+                    <div class="offer-oldBanner"></div>
+                    <div class="title-oldBanner"></div>
+                    <div class="desc-oldBanner"></div>
+                    <div class="btn-oldBanner btn"></div>
+                </div>
+                <div class="flex-1"></div>
+                <div class="sub-text">oldBanner</div>
+            </div>
+            <h1>睡眠弹窗</h1>
+            <div class="product-view flex flex-center-ver">
+                <div>
+                    <div class="offer-title-nature"></div>
+                    <div class="offer-desc-nature"></div>
+                </div>
+                <div class="btn-nature btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">nature-有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <div>
+                    <div class="title-nature"></div>
+                    <div class="desc-nature"></div>
+                </div>
+                <div class="btn-nature btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">nature-没有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <div>
+                    <div class="offer-title-sleepReport"></div>
+                    <div class="offer-desc-sleepReport"></div>
+                </div>
+                <div class="btn-sleepReport btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">sleepReport-有优惠资格</div>
+            </div>
+            <div class="product-view flex flex-center-ver">
+                <div>
+                    <div class="title-sleepReport"></div>
+                    <div class="desc-sleepReport"></div>
+                </div>
+                <div class="btn-sleepReport btn"></div>
+                <div class="flex-1"></div>
+                <div class="sub-text">sleepReport-没有优惠资格</div>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+        var content = '{\n  "turntable": {\n    "productId": "y2999",\n    "originalProductId": "y5999",\n    "productType": 2,\n    "showPriceType": 2,\n    "productTitle": "%price%/%period%",\n    "productDescription": "",\n    "offerId": "123",\n    "offerTitle": "Free Trial ((7)) days",\n    "offerDescription": "then %price%/%period%",\n    "bottomBtnTitle": "Free to use"\n  },\n  "gift": {\n    "productId": "y2999",\n    "originalProductId": "y5999",\n    "productType": 0,\n    "productTitle": "ONLY ((%currency% %convertPrice%))/%convertPeriod%",\n    "showPriceType": 1,\n    "productDescription": "Total %currency% %price%/%period% (((%currency% %originPrice%/%period%)))",\n    "bottomBtnTitle": "Seize Now"\n  },\n  "oldBanner": {\n    "productId": "y2999",\n    "originalProductId": "y5999",\n    "productType": 0,\n    "showPriceType": 1,\n    "productTitle": "Only  ((%currency% %convertPrice%))/%convertPeriod%",\n    "productDescription": "Total %currency% %price%/%period% (((%currency% %originPrice%/%period%)))",\n    "offer": "((%percent% OFF))",\n    "bottomBtnTitle": "Claim Now!"\n  },\n  "newDay1": {\n    "productId": "w1999",\n    "originalProductId": "",\n    "productType": 2,\n    "showPriceType": 2,\n    "productTitle": "((%currency% %price%))/%period%",\n    "productDescription": "",\n    "offerId": "w1999",\n    "offerTitle": "%currency% ((%offerPrice%)) One %period%",\n    "offerDescription": "then %currency% %price%/%period%",\n    "offer": "/%period%",\n    "bottomBtnTitle": "Continue!"\n  },\n  "newDay2": {\n    "productId": "w1999",\n    "originalProductId": "",\n    "productType": 2,\n    "showPriceType": 2,\n    "productTitle": "((%currency% %price%))/%period%",\n    "productDescription": "",\n    "offerId": "w1999",\n    "offerTitle": "%currency% ((%offerPrice%)) One %period%",\n    "offerDescription": "then %currency% %price%/%period%",\n    "offer": "/%period%",\n    "bottomBtnTitle": "Continue!"\n  },\n  "normal1": {\n    "productId": "y5999",\n    "originalProductId": "",\n    "productType": 0,\n    "showPriceType": 3,\n    "productTitle": "%currency%  ((%convertPrice%))/%convertPeriod%",\n    "productDescription": "Yearly plan，%currency% %price%/%period%",\n    "offer": "",\n    "bottomBtnTitle": "Continue"\n  },\n  "normal2": {\n    "productId": "m1999",\n    "productType": 3,\n    "showPriceType": 3,\n    "productTitle": "%currency%  ((%price%))/%period%",\n    "productDescription": "",\n    "bottomBtnTitle": "Continue"\n  },\n  "sleepReport": {\n    "productId": "w1999",\n    "originalProductId": "",\n    "productType": 2,\n    "showPriceType": 2,\n    "productTitle": "%currency% ((%price%)) One %period%",\n    "productDescription": "",\n    "offer": "",\n    "offerId": "",\n    "offerTitle": "Only %currency% ((%offerPrice%)) One %period%",\n    "offerDescription": "then %currency% %price%/%period%",\n    "bottomBtnTitle": "Get!"\n  },\n  "nature": {\n    "productId": "w1999",\n    "originalProductId": "",\n    "productType": 2,\n    "showPriceType": 2,\n    "productTitle": "%currency% ((%price%)) One %period%",\n    "productDescription": "",\n    "offer": "",\n    "offerId": "",\n    "offerTitle": "Only %currency% ((%offerPrice%)) One %period%",\n    "offerDescription": "then %currency% %price%/%period%",\n    "bottomBtnTitle": "Get!"\n  },\n  "showOdds": 0,\n  "isATest": false,\n  "openTurntable": false,\n  "closeAlpha": 1,\n  "allProductIds": [\n    "life5999",\n    "w699",\n    "y2999",\n    "y2499",\n    "y5999",\n    "y2999free",\n    "y5999free",\n    "y3599",\n    "w499",\n    "life3599",\n    "w1999",\n    "m1999"\n  ]\n}'
+        var formPlaceholder = [{"name":"%currency%","desc":"货币代号","sub":"","demo":"USD"},{"name":"%price%","desc":"默认价格","sub":"","demo":"$9.99"},{"name":"%offerPrice%","desc":"优惠价格","sub":"","demo":"$1.99"},{"name":"%originPrice%","desc":"对比价格","sub":"","demo":"$29.99"},{"name":"%period%","desc":"价格周期","sub":"0=Year;3=Month;2=Week;1=Day;9=Lifetime","demo":""},{"name":"%convertPrice%","desc":"转换价格","sub":"","demo":"$0.19"},{"name":"%convertPeriod%","desc":"转换价格周期","sub":"0=Year;3=Month;2=Week;1=Day;9=Lifetime","demo":""},{"name":"%percent%","desc":"折扣","sub":"默认价格 / 对比价格，结果会向上取10整数","demo":"50%"}]
+        var formJson = [{name:"productId",desc:"商品ID"},{name:"less20ProductId",desc:"<=20岁的商品ID"},{name:"originalProductId",desc:"用来对比的商品ID(不会用于实际交易)"},{name:"productType",desc:"商品的订阅周期"},{name:"showPriceType",desc:"转换价格的周期"},{name:"productTitle",desc:"商品标题"},{name:"productDescription",desc:"商品描述"},{name:"offerId",desc:"优惠ID"},{name:"offerTitle",desc:"优惠商品标题"},{name:"offerDescription",desc:"优惠商品描述"},{name:"bottomBtnTitle",desc:"按钮文字"},{name:"offer",desc:"辅助字段，用于多一个可以支持自定义显示内容，只有新人优惠，首页banner中有使用"}]
+        $(function() {
+            for (item of formPlaceholder) {
+                $("#form-placeholder").append(
+                    '<tr>'+
+                    '<td>'+item.name+'</td>'+
+                    '<td>'+item.desc+'<div class="sub-text">'+item.sub+'</div>'+'</td>'+
+                    '<td>'+item.demo+'</td>'+
+                    '</tr>'
+                )
+            }
+            for (item of formJson) {
+                $("#form-json").append(
+                    '<tr>'+
+                    '<td>'+item.name+'</td>'+
+                    '<td>'+item.desc+'</td>'+
+                    '</tr>'
+                )
+            }
+            var cookieJson = $.cookie('premium.json')
+            if (!cookieJson || cookieJson == "") {
+                $('#myTextarea').text(content)
+            } else {
+                $('#myTextarea').text(cookieJson)
+            }
+
+            $('#myTextarea').on('input', function() {
+                updateView()
+                $.cookie('premium.json', $("#myTextarea").val(), { expires: 30, path: '/' });
+            });
+            $('#show-demo').on('input', function() {
+                updateView()
+            });
+            updateView()
+        })
+
+        var periodMap = {
+            "0": "Year",
+            "3": "Month",
+            "2": "Week",
+            "1": "Day",
+        }
+
+        var placeholder = {
+            "%currency%": function(product){
+                if ($("#show-demo").is(':checked')) {
+                    return "USD"
+                }
+                if (!product.productId || product.productId == "") {
+                    return '<span class="error">没有配productId</span>'
+                }
+                return "USD"
+            },
+            "%price%": function(product){
+                if ($("#show-demo").is(':checked')) {
+                    return "$9.99"
+                }
+                if (!product.productId || product.productId == "") {
+                    return '<span class="error">没有配productId</span>'
+                }
+                return product.productId
+            },
+            "%offerPrice%": function(product){
+                if ($("#show-demo").is(':checked')) {
+                    return "$1.99"
+                }
+                if (!product.offerId || product.offerId == "") {
+                    return '<span class="error">没有配offerId</span>'
+                }
+                return product.offerId
+            },
+            "%originPrice%": function(product){
+                if ($("#show-demo").is(':checked')) {
+                    return "$29.99"
+                }
+                if (!product.originalProductId || product.originalProductId == "") {
+                    return '<span class="error">没有配originalProductId</span>'
+                }
+                return product.originalProductId
+            },
+            "%convertPrice%": function(product){
+                if ($("#show-demo").is(':checked')) {
+                    return "$0.19"
+                }
+                if (!product.productId || product.productId == "") {
+                    return '<span class="error">没有配productId</span>'
+                }
+                var period = getPeriodText(product.showPriceType)
+                if (period == "") {
+                    return '<span class="error">没有配showPriceType或者是非法值</span>'
+                }
+                return product.productId+period
+            },
+            "%percent%": function(product){
+                if ($("#show-demo").is(':checked')) {
+                    return "USD"
+                }
+                if (!product.productId || product.productId == "") {
+                    return '<span class="error">没有配productId</span>'
+                }
+                if (!product.originalProductId || product.originalProductId == "") {
+                    return '<span class="error">没有配originalProductId</span>'
+                }
+                return "50%"
+            },
+            "%period%": function(product){
+                var period = getPeriodText(product.productType)
+                if (period == "") {
+                    return '<span class="error">没有配productType或者是非法值</span>'
+                }
+                return period
+            },
+            "%convertPeriod%": function(product){
+                var period = getPeriodText(product.showPriceType)
+                if (period == "") {
+                    return '<span class="error">没有配showPriceType或者是非法值</span>'
+                }
+                return period
+            },
+        }
+
+        function updateView() {
+            var json
+            try {
+                json = JSON.parse($("#myTextarea").val())
+                $("#json-error").html('')
+            } catch(e) {
+                $("#json-error").html('<span class="error">JSON格式错误</span>')
+                return
+            }
+            var lossId = []
+            var showDemo = $("#show-demo").is(':checked')
+
+            for (key of Object.keys(json)) {
+                var item = json[key]
+                if (json.allProductIds) {
+                    if (item.productId && json.allProductIds.indexOf(item.productId) == -1) {
+                        lossId.push(item.productId)
+                    }
+                    if (item.originalProductId && json.allProductIds.indexOf(item.originalProductId) == -1) {
+                        lossId.push(item.originalProductId)
+                    }
+                }
+                if ($(".title-"+key).length!=0) {
+                    var content = replacePlaceHolder(json[key].productTitle, json[key])
+                    if (!showDemo && content == "") content = '<span class="error">没有配productTitle</span>'
+                    $(".title-"+key).html(content)
+                }
+                if ($(".desc-"+key).length!=0) {
+                    var content = replacePlaceHolder(json[key].productDescription, json[key])
+                    if (!showDemo && content == "") content = '<span class="error">没有配productDescription</span>'
+                    $(".desc-"+key).html(content)
+                }
+                if ($(".offer-title-"+key).length!=0) {
+                    var content = replacePlaceHolder(json[key].offerTitle, json[key])
+                    if (!showDemo && content == "") content = '<span class="error">没有配offerTitle</span>'
+                    $(".offer-title-"+key).html(content)
+                }
+                if ($(".offer-desc-"+key).length!=0) {
+                    var content = replacePlaceHolder(json[key].offerDescription, json[key])
+                    if (!showDemo && content == "") content = '<span class="error">没有配offerDescription</span>'
+                    $(".offer-desc-"+key).html(content)
+                }
+                if ($(".btn-"+key).length!=0) {
+                    var content = replacePlaceHolder(json[key].bottomBtnTitle, json[key])
+                    if (!showDemo && content == "") content = '<span class="error">没有配bottomBtnTitle</span>'
+                    $(".btn-"+key).html(content)
+                }
+                if ($(".offer-"+key).length!=0) {
+                    var content = replacePlaceHolder(json[key].offer, json[key])
+                    if (!showDemo && content == "") content = '<span class="error">没有配offer</span>'
+                    $(".offer-"+key).html(content)
+                }
+            }
+            if (lossId.length > 0) {
+                $("#loss-id").html('<span class="error">allProductIds缺少：'+lossId+"</span>")
+            }
+        }
+
+        function getPeriodText(period) {
+            var period = periodMap[period.toString()]
+            if (period) {
+                return period
+            } else {
+                return ""
+            }
+        }
+
+        function replacePlaceHolder(content, product) {
+            if (!content) return ""
+            var regex = /%[^%]+%/g
+            var regex2 = /\(\((.*?)\)\)/g
+            return content.replace(regex, function(match){
+                var target = placeholder[match]
+                if (typeof target == "function") {
+                    target = target(product)
+                }
+                if (target == "") {
+                    return '<span class="error">检查'+match+'</span>'
+                } else {
+                    return target
+                }
+            }).replace(regex2, function(match){
+                return match.replace("((", '<span class="big-color">')
+                    .replace("))", '</span>')
+            })
+        }
+    </script>
+</body>
+</html>
