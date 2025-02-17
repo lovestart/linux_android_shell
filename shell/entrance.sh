@@ -10,6 +10,7 @@ scripts=(
     "生成签名文件keystore:generateKeystore.sh"
     "查看签名的哈希散列base64编码:querySigntureHashBase64.sh"
     "生成play store上架output.zip:generatePlayStoreOutputZip.sh"
+    "上传文件:megacmd.sh"
 )
 
 if [ -z "$1" ]; then
