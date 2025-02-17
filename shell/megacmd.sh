@@ -18,8 +18,8 @@ else
   fi
   sudo apt install "$PWD/$fileName"
   if dpkg -l | grep -q "megacmd"; then
-    echo "megacmd 安装成功"
-  fi
+      echo "megacmd 安装成功"
+    fi
 fi
 
 if mega-whoami | grep -q "e-mail"; then
@@ -67,4 +67,12 @@ while true; do
   fi
 done
 mega-put $target_path
+target_name=$(basename $target_path)
+echo ''
+echo '输出下载地址：'
+if ! mega-export -a "$target_name"; then
+  mega-export "$target_name" | head -n 1
+fi
+
+
 
