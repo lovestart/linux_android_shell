@@ -81,19 +81,37 @@ cp -f $sh_path $project_code
 yes | sdkmanager --sdk_root=$ANDROID_HOME --licenses
 
 echo '输入git源地址'
-read git_remote
-#echo "你输入的是$git_remote"
+while true; do
+    read git_remote
+    # echo "你输入的是$git_remote"
+    if [ -n "$git_remote" ]; then
+        break  # 退出循环，因为路径有效
+    else
+        echo "请输入git源地址！ $git_remote"
+    fi
+done
 
 echo '输入分支名称，不输默认拉取主分支'
 read git_brunch
 #echo "你输入的是$git_brunch"
 
+echo '输入git token（可选）'
+read git_token
+#echo "你输入的是$git_token"
+
+if [ -n "$git_token" ]; then
+    git_full_remote=$(sed -E "s#(http[s]?://)#\1${git_token}@#" <<< "$git_remote")
+else
+    git_full_remote="$git_remote"
+fi
+echo "$git_full_remote"
+
 cd $project_dir
 
 if [ -z "$git_brunch" ]; then
-    git clone $git_remote
+    git clone $git_full_remote
 else
-    git clone -b $git_brunch $git_remote
+    git clone -b $git_brunch $git_full_remote
 fi
 
 
