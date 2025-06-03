@@ -338,10 +338,7 @@
 		    var assetsFolder = flavorFolder.folder("assets")
 		    var xmlFolder = flavorFolder.folder("res").folder("xml")
 
-		    // if (!insertFile(rootFolder, "configFileSign")) {
-			// 	toastr.error("没有上传签名文件")
-		    // 	return
-		    // }
+		    insertFile(rootFolder, "configFileSign")
 		    if ($("#config-dev-google-json")[0].checked) {
 				if ($("#config-application-id")[0].value == '') {
 					toastr.error("没有输入包名")
@@ -350,12 +347,9 @@
 		    	var googleJson = '{\n  "project_info": {\n    "project_number": "myapp-project-123",\n    "project_id": "myapp-project-123",\n    "storage_bucket": "appspot.com"\n  },\n  "client": [\n    {\n      "client_info": {\n        "mobilesdk_app_id": "1:1234567890:android:321abc456def7890",\n        "android_client_info": {\n          "package_name": "###"\n        }\n      },\n      "oauth_client": [\n        {\n          "client_id": "apps.googleusercontent.com",\n          "client_type": 3\n        }\n      ],\n      "api_key": [\n        {\n          "current_key": "Abcdefghijklmnopqrstuvwxyz-abcdefghijkl"\n        }\n      ],\n      "services": {\n        "appinvite_service": {\n          "other_platform_oauth_client": [\n            {\n              "client_id": "apps.googleusercontent.com",\n              "client_type": 3\n            }\n          ]\n        }\n      }\n    }\n  ],\n  "configuration_version": "1"\n}'
 		    		.replace("###", $("#config-application-id")[0].value.trim())
 		    	flavorFolder.file("google-services.json", string2blob(googleJson))
-		    }// else {
-			//     if (!insertFile(flavorFolder, "configFileGoogle")) {
-			// 		toastr.error("没有上传google-services.json")
-			//     	return
-			//     }
-		    // }
+		    } else {
+				insertFile(flavorFolder, "configFileGoogle")
+		    }
 		    insertFolder(assetsFolder, "configFileAssets")
 
 			var hostName = $("#config-hostName")[0].value.trim()
