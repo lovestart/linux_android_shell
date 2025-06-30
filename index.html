@@ -310,11 +310,11 @@
 				return
 			}
 
-			var rootIgnore = '/###'
+			var rootIgnore = '*.iml\n.gradle\n.DS_Store\n/build\n/captures\n.externalNativeBuild\n.cxx\nlocal.properties\n/.kotlin\n/.idea\n/###'
 				.replace("###", rootFolderName)
 			$('#root-ignore').text(rootIgnore)
 
-			var appIgnore = 'src/###\n###'
+			var appIgnore = '/build\nsrc/###\n###'
 				.replaceAll("###", flavorFolderName)
 			$('#app-ignore').text(appIgnore)
 
