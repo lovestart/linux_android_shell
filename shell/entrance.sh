@@ -23,7 +23,7 @@ else
     index="$1"
 fi
 
-prefix_url="https://github.com/hzl000/shell/releases/download/v1.0.0/"
+prefix_url="https://github.com/lovestart/linux_android_shell/releases/download/v1.0.0/"
 
 if [ "$index" -ge 0 ] && [ "$index" -lt "${#scripts[@]}" ]; then
     # 获取脚本信息
