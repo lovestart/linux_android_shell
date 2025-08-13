@@ -84,13 +84,16 @@ apt install linux-modules-extra-`uname -r`
 modprobe binder_linux devices="binder,hwbinder,vndbinder"
 # modprobe ashmem_linux
 
-containerName="redroid11"
+containerName="redroid12"
 if ! docker ps -a --format '{{.Names}}' | grep -q "$containerName"; then
   docker run -itd --privileged \
     -v ~/data11:/data \
     -p 5555:5555 \
     --name "$containerName" \
-    redroid/redroid:11.0.0-latest
+    androidboot.redroid_width=1080 \
+    androidboot.redroid_height=2408 \
+    androidboot.redroid_dpi=450 \
+    redroid/redroid:12.0.0-latest
 else
   docker restart "$containerName"
 fi
