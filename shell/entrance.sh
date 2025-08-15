@@ -23,7 +23,7 @@ else
     index="$1"
 fi
 
-prefix_url="https://github.com/lovestart/linux_android_shell/releases/download/v1.0.2/"
+prefix_url="https://github.com/lovestart/linux_android_shell/releases/download/v1.0.3/"
 
 if [ "$index" -ge 0 ] && [ "$index" -lt "${#scripts[@]}" ]; then
     # 获取脚本信息
@@ -34,7 +34,10 @@ if [ "$index" -ge 0 ] && [ "$index" -lt "${#scripts[@]}" ]; then
     script_file="${script_info#*:}"
 
     echo "执行脚本: $script_name"
-    sudo /bin/bash -c "$(curl -fsSL "${prefix_url}${script_file}")"
+    curl -fsSL "${prefix_url}${script_file}
+    #sudo /bin/bash -c "$(curl -fsSL "${prefix_url}${script_file}")"
 else 
     echo "没找到'$index'对应的操作"
 fi
+
+shortcuts.xml
